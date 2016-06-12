@@ -1,3 +1,6 @@
 # ignore binary
 funbit
 
+# Protect secrets in config
+conf.yml
+
