@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strings"
 
 	"golang.org/x/net/context"
@@ -16,7 +17,24 @@ import (
 	"github.com/spf13/viper"
 )
 
+func printConfigFile() {
+	fmt.Println(`
+# Specify your settings from dev.fitbit.com here
+server:
+    client_id:
+	secret:
+	redirect_uri:
+
+	`)
+
+}
+
 func main() {
+
+	if os.Args[1] == "printConfig" {
+		printConfigFile()
+		os.Exit(0)
+	}
 
 	// read config
 	viper.SetConfigName("conf")
