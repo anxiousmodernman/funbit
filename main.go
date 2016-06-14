@@ -52,17 +52,24 @@ func main() {
 	svr.ClientID = viper.GetString("server.client_id")
 	svr.Secret = viper.GetString("server.secret")
 	svr.RedirectURI = viper.GetString("server.redirect_uri")
+
 	db, err := bolt.Open("funbit.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal("WTF", err)
 	}
 	svr.DB = db
 
+	//go populateData(db)
+
 	addr := "0.0.0.0:42069"
 	log.Println("Starting server on", addr)
 	log.Println("Server data:", svr)
 
 	http.ListenAndServe(addr, &svr)
+}
+
+func populateData(db *bolt.DB) {
+
 }
 
 // Server is our Handler
