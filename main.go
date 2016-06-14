@@ -90,6 +90,8 @@ func (svr *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/auth":
 		svr.Auth(ctx, w, r)
+	case "/keys":
+		svr.AllKeys(ctx, w, r)
 	default:
 		Reply404(ctx, w, r)
 	}
@@ -106,6 +108,27 @@ func AuthHdrFromContext(ctx context.Context) string {
 	} else {
 		return s
 	}
+}
+
+func (svr *Server) AllKeys(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+
+	var keyResults string
+
+	svr.DB.View(func(tx *bolt.Tx) error {
+		// Assume bucket exists and has keys
+		b := tx.Bucket([]byte("tokens"))
+
+		c := b.Cursor()
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			fmt.Printf("key=%s, value=%s\n", k, v)
+			keyResults += fmt.Sprintf("key=%s, value=%s\n", k, v)
+		}
+
+		return nil
+	})
+
+	w.Write([]byte(keyResults))
 }
 
 func (svr *Server) Auth(ctx context.Context, w http.ResponseWriter, r *http.Request) {
@@ -164,8 +187,8 @@ func (svr *Server) Auth(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	log.Println("Got this data")
-	log.Println(auth)
+	// log.Println("Got this data")
+	// log.Println(auth)
 
 	err = svr.DB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte("tokens"))
