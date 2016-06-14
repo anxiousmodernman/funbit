@@ -10,10 +10,12 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"golang.org/x/net/context"
 
 	"github.com/anxiousmodernman/funbit/fitbit"
+	"github.com/boltdb/bolt"
 	"github.com/spf13/viper"
 )
 
@@ -31,9 +33,12 @@ server:
 
 func main() {
 
-	if os.Args[1] == "printConfig" {
-		printConfigFile()
-		os.Exit(0)
+	if len(os.Args) > 1 {
+		// gotta do this or we'll PANIC
+		if os.Args[1] == "printConfig" {
+			printConfigFile()
+			os.Exit(0)
+		}
 	}
 
 	// read config
@@ -47,6 +52,11 @@ func main() {
 	svr.ClientID = viper.GetString("server.client_id")
 	svr.Secret = viper.GetString("server.secret")
 	svr.RedirectURI = viper.GetString("server.redirect_uri")
+	db, err := bolt.Open("funbit.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+	if err != nil {
+		log.Fatal("WTF", err)
+	}
+	svr.DB = db
 
 	addr := "0.0.0.0:42069"
 	log.Println("Starting server on", addr)
@@ -60,6 +70,7 @@ type Server struct {
 	ClientID    string
 	RedirectURI string
 	Secret      string
+	DB          *bolt.DB
 }
 
 // Use these constants for keys into the context.Context object.
@@ -156,6 +167,25 @@ func (svr *Server) Auth(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	log.Println("Got this data")
 	log.Println(auth)
 
+	err = svr.DB.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte("tokens"))
+		if err != nil {
+			return err
+		}
+
+		buf, err := json.Marshal(auth)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("Oh shit it succeeded")
+
+		return b.Put([]byte(auth.UserID), buf)
+	})
+
+	if err != nil {
+		fmt.Println("shit was so successful")
+	}
 }
 
 func Reply404(ctx context.Context, w http.ResponseWriter, r *http.Request) {

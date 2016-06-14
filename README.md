@@ -55,6 +55,9 @@ and see debug output in the terminal.
 
 ## To Do
 
+* Store Data in boltDB
+* Poll/de-dupe data 
 * Construct the authorization URL on some **/login** page
 * Run on Digital Ocean
+
 

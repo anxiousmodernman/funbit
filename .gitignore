@@ -4,3 +4,6 @@ funbit
 # Protect secrets in config
 conf.yml
 
+# ignore boltdb files
+*.db
+
