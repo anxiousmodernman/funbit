@@ -24,10 +24,10 @@ func printConfigFile() {
 # Specify your settings from dev.fitbit.com here
 server:
     client_id:
-	secret:
-	redirect_uri:
+    secret:
+    redirect_uri:
 
-	`)
+`)
 
 }
 
