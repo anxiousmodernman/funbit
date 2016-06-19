@@ -15,10 +15,6 @@ import (
 	"golang.org/x/net/context"
 )
 
-func populateData(db *bolt.DB) {
-
-}
-
 // Server is our Handler
 type Server struct {
 	ClientID    string
