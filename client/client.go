@@ -1,4 +1,4 @@
-package fitbit
+package client
 
 import "encoding/base64"
 

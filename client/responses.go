@@ -1,4 +1,4 @@
-package fitbit
+package client
 
 type AuthResponse struct {
 	AccessToken  string `json:"access_token,"`
