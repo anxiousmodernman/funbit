@@ -37,6 +37,7 @@ func LoadDatabaseFixtures(fixturePath, databasePath string) error {
 				return err
 			}
 
+			// load the k-v pair into the bucket
 			err = b.Put([]byte(item.UserID), converted)
 			if err != nil {
 				log.Println("Could not put AuthResponse for test fixture", err)
